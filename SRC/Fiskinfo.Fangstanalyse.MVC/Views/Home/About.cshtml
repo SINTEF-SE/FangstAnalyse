@@ -1,0 +1,41 @@
+﻿@using SintefSecure.Framework.SintefSecure.AspNetCore
+@using SintefSecure.Framework.SintefSecure.AspNetCore.TagHelpers.OpenGraph.Media
+@using SintefSecure.Framework.SintefSecure.AspNetCore.TagHelpers.OpenGraph.Structs
+@inject IOptions<AppSettings> AppSettings
+@{
+    // See Index.cshtml for full comments.
+    ViewBag.Title = "About";
+    ViewBag.Description = "The about page!";
+}
+
+@section head
+{
+    @* See Index.cshtml for full comments. *@
+    <meta name="author" content="SINTEF">
+    <twitter-card-summary-large-image username="@@SINTEF">
+        <open-graph-business site-name="@AppSettings.Value.SiteTitle"
+                             title="@ViewBag.Title"
+                             main-image="@(new OpenGraphImage(
+                                               Url.AbsoluteContent("~/img/icons/open-graph-1200x630.png"),
+                                               ContentType.Png,
+                                               1200,
+                                               630))"
+                             contact-data="@(new OpenGraphContactData("4 Strindvegen", "Trondheim", "SW1 1SW", "Norway")
+                                             {
+                                                 Email = "email@example.com",
+                                                 Phone = "111-222-333-444",
+                                                 Website = Url.AbsoluteRouteUrl(HomeControllerRoute.GetIndex)
+                                             })"
+                             location="@(new OpenGraphLocation(69.5286417, 3.1015987))"
+                             determiner="Blank">
+        </open-graph-business>
+    </twitter-card-summary-large-image>
+    <meta asp-referrer="OriginWhenCrossOrigin">
+}
+
+<header class="page-header">
+    <h1>
+        <span aria-hidden="true" class="fa fa-users"></span> @ViewBag.Title</h1>
+</header>
+
+<p>@ViewBag.Description</p>

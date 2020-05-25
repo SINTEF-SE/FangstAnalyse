@@ -1,0 +1,216 @@
+﻿body * {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+#wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background: #edede5;
+}
+
+#map {
+  width: 100%;
+  background: white;
+}
+
+#search-widget {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.search-selects-container {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  height: calc(100% - 40px);
+  min-height: 0;
+}
+.search-widget-item {
+  display: flex;
+  flex: 1;
+  margin: 5px;
+  padding: 5px;
+  border: 1px lightgray solid;
+}
+.search-button-container {
+  display: flex;
+  height: 50px;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 5px;
+}
+.search-button {
+  border: none !important;
+  outline: none !important;
+}
+
+.info i {
+  margin: 10px;
+}
+
+.search-button-container.loading span {
+  display: inline-block !important;
+  margin-right: 5px;
+}
+.search-button-container span {
+  display: none;
+}
+.search-button-container button {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* hack */
+.search-selects-container tr td:nth-child(3) {
+  display: none;  
+}
+
+.widget-drawer-open {
+  width: 55% !important;
+}
+
+@media screen and (max-width: 1000px) {
+  .widget-drawer-open {
+    width: calc(100% - 55px) !important;
+  }
+}
+
+.fa-data-selector {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  background: #E1E1D9;
+  padding: 10px;
+  border-bottom: 1px solid lightgray;
+}
+
+.fa-data-selector .fa-data-selector-row {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+}
+
+.fa-data-selector .fa-data-selector-row .column-text {
+  display: flex;
+  align-items: flex-start;
+  min-width: 45px;
+  font-size: 13px;
+  padding-top: 8px;
+}
+
+.fa-data-selector .fa-data-selector-row .column-colon {
+  display: flex;
+  align-items: flex-start;
+  font-size: 13px;
+  padding: 8px 5px;
+}
+
+.fa-data-selector .fa-data-selector-row .column-values {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.fa-data-selector .fa-data-selector-row .column-values .item {
+  display: flex;
+  align-items: center;
+  background: #007bff;
+  border: 2px solid #007bff;
+  color: white;
+  padding: 0 6px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  height: 24px;
+}
+
+.fa-data-selector:not(.max-reached) .fa-data-selector-row .column-values .item:not(.selected) {
+  background-color: transparent;
+  color: black;
+  border: 2px solid #007bff;
+}
+
+.fa-data-selector .fa-data-selector-row .column-values.disabled .item:not(.selected) {
+  background-color: #D3D3D3;
+  border: 2px solid #D3D3D3;
+  color: white;
+}
+
+.fa-data-selector .fa-data-selector-row.buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fa-data-selector .fa-data-selector-row.buttons .btn {
+  padding: 4px 8px;
+  font-size: 14px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.fa-data-selector.minimized .fa-data-selector-row:not(.buttons) {
+  display: none;
+}
+
+.fa-data-selector.minimized .fa-data-selector-row.buttons .update {
+  display: none;
+}
+
+.fa-data-selector.minimized .fa-data-selector-row.buttons i.up {
+  display: none;
+}
+.fa-data-selector:not(.minimized) .fa-data-selector-row.buttons i.down {
+  display: none;
+}
+
+.fa-data-selector .fa-data-selector-row.buttons .update {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.fa-data-selector:not(.downloading) .fa-data-selector-row.buttons .update .status {
+  display: none;
+}
+
+.fa-data-selector .fa-data-selector-row.buttons .update .status {
+  margin-right: 5px;
+}
+
+.fa-data-selector .fa-data-selector-row.buttons .status-small {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+}
+
+.fa-data-selector:not(.minimized) .fa-data-selector-row.buttons .summation-string-container {
+  display: none;
+}
+
+.fa-data-selector .fa-data-selector-row.buttons .summation-string-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  font-size: 12px;
+  height: 36px;
+}
+
+.fa-data-selector.downloading.minimized .fa-data-selector-row.buttons .status-small {
+  display: flex;
+}
+
+.fa-top-element {
+  display: flex;
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.2) !important;
+  position: relative;
+  width: 240px;
+  height: 30px;
+  border-radius: 2px;
+  justify-content: center;
+  align-items: center;
+}

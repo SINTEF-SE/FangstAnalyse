@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Build">
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- Use the latest version of the C# language. -->
+    <LangVersion>latest</LangVersion>
+    <!-- CS1591 - Don't warn about all public members not being documented. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Used to store connection strings and other sensitive settings, so you don't have to check them into your source
+         control provider. Only use this in Development, it is not intended for Production use.
+         See http://docs.asp.net/en/latest/security/app-secrets.html -->
+    <UserSecretsId>Fiskinfo.Fangstanalyse.API2-85D3C67D-6706-48BD-9F64-1E1AD04B82B9</UserSecretsId>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package">
+    <Version>1.0.0</Version>
+    <Authors>Peter Haro</Authors>
+    <Company>Peter Haro</Company>
+    <Product>Fiskinfo Fangstanalyse API</Product>
+    <Description>API for Fiskinfo tjenesten ‘fangstanalyse’ som tilbyr data relatert til åpne fiskeri data, værmeldinger og annotert sammenstilt data</Description>
+    <Copyright>Copyright © Peter Haro. All rights Reserved</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup Label="Files">
+    <Content Include="wwwroot\.well-known\security.txt">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.0" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
+    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+    <PackageReference Include="Serilog.Exceptions" Version="5.3.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
+    <PackageReference Include="SintefSecureFramework.AspNetCore" Version="1.0.3" />
+    <PackageReference Include="SintefSecureFramework.AspNetCore.Swagger" Version="1.0.2" />
+    <PackageReference Include="SIntefSecureFramework.Mapping" Version="1.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc4" />
+  </ItemGroup>
+
+</Project>
