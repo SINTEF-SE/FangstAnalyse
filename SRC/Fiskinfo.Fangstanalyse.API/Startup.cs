@@ -75,8 +75,6 @@ namespace Fiskinfo.Fangstanalyse.API
                 .AddCustomMvcOptions()
                 .Services
                 .AddProjectCommands()
-                .AddProjectMappers()
-                .AddProjectRepositories()
                 .AddProjectServices()
                 .BuildServiceProvider();
         
@@ -85,7 +83,18 @@ namespace Fiskinfo.Fangstanalyse.API
         /// Configures the application and HTTP request pipeline. Configure is called after ConfigureServices is
         /// called by the ASP.NET runtime.
         /// </summary>
-        public void Configure(IApplicationBuilder application) =>
+        public void Configure(IApplicationBuilder application) {
+            if(hostingEnvironment.IsDevelopment())
+            {
+                application.UseHsts()
+                    .UseDeveloperErrorPages()
+                    .UseCors(CorsPolicyName.AllowAny);
+
+            } else
+            {
+                application.UseCors(CorsPolicyName.AllowProd);
+            }
+            
             application
                 // Pass a GUID in a X-Correlation-ID HTTP header to set the HttpContext.TraceIdentifier.
                 // UpdateTraceIdentifier must be false due to a bug. See https://github.com/aspnet/AspNetCore/issues/5144
@@ -93,13 +102,6 @@ namespace Fiskinfo.Fangstanalyse.API
                 .UseForwardedHeaders()
                 .UseResponseCaching()
                 .UseResponseCompression()
-                .UseCors(CorsPolicyName.AllowAny)
-                .UseIf(
-                    !this.hostingEnvironment.IsDevelopment(),
-                    x => x.UseHsts())
-                .UseIf(
-                    this.hostingEnvironment.IsDevelopment(),
-                    x => x.UseDeveloperErrorPages())
                 .UseHealthChecks("/status")
                 .UseHealthChecks("/status/self", new HealthCheckOptions() {Predicate = _ => false})
                 .UseStaticFilesWithCacheControl()
@@ -107,5 +109,6 @@ namespace Fiskinfo.Fangstanalyse.API
                 .UseSwagger(
                     options => { options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value); })
                 .UseCustomSwaggerUI();
+        }
     }
 }

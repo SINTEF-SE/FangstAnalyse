@@ -8,8 +8,6 @@ namespace Fiskinfo.Fangstanalyse.Infrastructure
 {
     public partial class FangstanalyseContext : DbContext
     {
-        private readonly string FangstAnalyseConnectionString = "Host={host};Database={database};Username={username};Password={password}";
-
         public FangstanalyseContext()
         {
         }

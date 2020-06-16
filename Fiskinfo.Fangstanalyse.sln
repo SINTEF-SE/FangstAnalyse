@@ -15,10 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fiskinfo.Fangstanalyse.Infr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fiskinfo.Fangstanalyse.WebApp", "SRC\Fiskinfo.Fangstanalyse.WebApp\Fiskinfo.Fangstanalyse.WebApp.csproj", "{2343BFF7-9899-43A3-AB42-8907BD8BBBC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiskinfo.Fangstanalyse.API2", "SRC\Fiskinfo.Fangstanalyse.API2\Source\Fiskinfo.Fangstanalyse.API2\Fiskinfo.Fangstanalyse.API2.csproj", "{8C98A2B2-38F4-4C3D-A9D4-AF677E6A7991}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiskinfo.Fangstanalyse.API2.IntegrationTest", "SRC\Fiskinfo.Fangstanalyse.API2\Tests\Fiskinfo.Fangstanalyse.API2.IntegrationTest\Fiskinfo.Fangstanalyse.API2.IntegrationTest.csproj", "{D2E12A9D-EDF4-4971-8082-788848050E51}"
-EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{85CAC791-E5D2-496A-BBDF-E0B9C21EFA36}"
 EndProject
 Global
@@ -39,14 +35,6 @@ Global
 		{2343BFF7-9899-43A3-AB42-8907BD8BBBC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2343BFF7-9899-43A3-AB42-8907BD8BBBC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2343BFF7-9899-43A3-AB42-8907BD8BBBC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C98A2B2-38F4-4C3D-A9D4-AF677E6A7991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C98A2B2-38F4-4C3D-A9D4-AF677E6A7991}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C98A2B2-38F4-4C3D-A9D4-AF677E6A7991}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C98A2B2-38F4-4C3D-A9D4-AF677E6A7991}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2E12A9D-EDF4-4971-8082-788848050E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2E12A9D-EDF4-4971-8082-788848050E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2E12A9D-EDF4-4971-8082-788848050E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2E12A9D-EDF4-4971-8082-788848050E51}.Release|Any CPU.Build.0 = Release|Any CPU
 		{85CAC791-E5D2-496A-BBDF-E0B9C21EFA36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{85CAC791-E5D2-496A-BBDF-E0B9C21EFA36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85CAC791-E5D2-496A-BBDF-E0B9C21EFA36}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -59,8 +47,6 @@ Global
 		{BF611862-4BC1-4F1E-BB69-1F7635BE9096} = {AEEB9929-D57C-4863-97B7-BD3B7068F9C2}
 		{1DD1029E-84E2-451C-8B99-F5F56A0DDCFD} = {AEEB9929-D57C-4863-97B7-BD3B7068F9C2}
 		{2343BFF7-9899-43A3-AB42-8907BD8BBBC3} = {AEEB9929-D57C-4863-97B7-BD3B7068F9C2}
-		{8C98A2B2-38F4-4C3D-A9D4-AF677E6A7991} = {AEEB9929-D57C-4863-97B7-BD3B7068F9C2}
-		{D2E12A9D-EDF4-4971-8082-788848050E51} = {9C3BA28F-E2CD-4A57-A229-28655A079C16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EEBFC24E-760D-43FC-92EF-C1FB25742847}

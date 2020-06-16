@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Fiskinfo.Fangstanalyse.API.ViewModelSchemaFilters;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Fiskinfo.Fangstanalyse.API.ViewModels
 {
-[SwaggerSchemaFilter(typeof(PageResultCarSchemaFilter))]
+[SwaggerSchemaFilter(typeof(ISchemaFilter))]
 public class PageResult<T>
     where T : class
 {

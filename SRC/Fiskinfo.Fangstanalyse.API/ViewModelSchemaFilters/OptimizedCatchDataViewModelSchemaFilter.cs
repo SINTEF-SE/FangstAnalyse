@@ -9,7 +9,7 @@ namespace Fiskinfo.Fangstanalyse.API.ViewModelSchemaFilters
     {
         public void Apply(Schema model, SchemaFilterContext context)
         {
-            var car = new OptimizedCatchDataViewModel()
+            var catchData = new OptimizedCatchDataViewModel()
             {
                 rundvekt = 201.23,
                 fangstfelt = "2338",
@@ -19,8 +19,8 @@ namespace Fiskinfo.Fangstanalyse.API.ViewModelSchemaFilters
                 kvalitetkode = 20,
                 redskapkode = 2
             };
-            model.Default = car;
-            model.Example = car;
+            model.Default = catchData;
+            model.Example = catchData;
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Fiskinfo.Fangstanalyse.API.Commands;
-using Fiskinfo.Fangstanalyse.API.Mappers;
-using Fiskinfo.Fangstanalyse.API.Repositories;
 using Fiskinfo.Fangstanalyse.API.Services;
 using Fiskinfo.Fangstanalyse.API.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,16 +27,6 @@ namespace Fiskinfo.Fangstanalyse.API
                 .AddScoped<IGetWindData, GetWindData>()
                 .AddScoped<IGetTemperatureAndAirPressureData, GetTemperatureAndAirPressureData>()
                 .AddScoped<IGetDetailedCatchDataByDate, GetDetailedFilteredCatchData>();
-
-        public static IServiceCollection AddProjectMappers(this IServiceCollection services) =>
-            services
-                .AddSingleton<IMapper<Models.Car, Car>, CarToCarMapper>()
-                .AddSingleton<IMapper<Models.Car, SaveCar>, CarToSaveCarMapper>()
-                .AddSingleton<IMapper<SaveCar, Models.Car>, CarToSaveCarMapper>();
-
-        public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
-            services
-                .AddSingleton<ICarRepository, CarRepository>();
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
             services

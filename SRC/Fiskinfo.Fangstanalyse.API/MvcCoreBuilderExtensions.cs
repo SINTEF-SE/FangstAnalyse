@@ -21,6 +21,7 @@ namespace Fiskinfo.Fangstanalyse.API
         public static IMvcCoreBuilder AddCustomCors(this IMvcCoreBuilder builder) =>
             builder.AddCors(
                 options =>
+                
                     // Create named CORS policies here which you can consume using application.UseCors("PolicyName")
                     // or a [EnableCors("PolicyName")] attribute on your controller or action.
                     options.AddPolicy(
