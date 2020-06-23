@@ -614,6 +614,13 @@ fetch("/data/fangstfelt.json")
             const visible = !seaMapLayerToggle.isActive();
             seaMapLayerToggle.setActive(visible);
             seaMapLayer.setVisible(visible);
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'Map',
+                eventAction: 'BaseLayerChanged',
+                eventLabel: 'interaction',
+                eventValue: 1
+            });
         });
         
         function getDetailedDownloadUrl() {
