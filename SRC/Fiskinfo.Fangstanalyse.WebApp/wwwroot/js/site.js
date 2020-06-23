@@ -682,6 +682,12 @@ fetch("/data/fangstfelt.json")
                 const catchAreaFilterString = currentCatchAreaFilters.join(',');
                 downloadUrl += `&catchAreas=${catchAreaFilterString}`;
             }
+            ga('send', {
+                hitType: 'event',
+                eventCategory: 'detailed_info',
+                eventAction: downloadUrl,
+                eventLabel: 'download'
+            });
             return downloadUrl;
         }
 
