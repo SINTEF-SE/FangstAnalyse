@@ -26,6 +26,7 @@ class DataSelector {
         this._initializeDataSelectorElements(domId);
         this._setupButtonEvents();
         this._addItems();
+        this._eventCallbacks = {};
     }
 
     _initializeDataSelectorElements(domId) {
@@ -118,6 +119,11 @@ class DataSelector {
         this._downloadCount = this._getDownloadCount();
         this._dataSelectorElement.classList.add('downloading');
         let currentDate = new Date();
+
+        this.trigger("update", {
+            years: this._getSelectedYears(),
+            months: Object.keys(this._selectedMonths).map(key => this._months.indexOf(key) + 1)
+        });
 
         for (const year of this._getSelectedYears()) {
             for (let month of this._getSelectedMonths()) {
@@ -377,6 +383,19 @@ class DataSelector {
 
     getID() {
         return "data-selector";
+    }
+    
+    on(event, callback) {
+        const callbacks = this._eventCallbacks[event] || [];
+        callbacks.push(callback);
+        this._eventCallbacks[event] = callbacks;
+    }
+    
+    trigger(event, message) {
+        const callbacks = this._eventCallbacks[event] || [];
+        for (const callback of callbacks) {
+            callback(message);
+        }
     }
 
 }

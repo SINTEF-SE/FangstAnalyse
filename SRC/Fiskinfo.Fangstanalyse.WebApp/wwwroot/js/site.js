@@ -165,6 +165,13 @@ function createCoordinateLookup(json) {
     }
 }
 
+function sendFilteredGAEvent(chartName) {
+    gtag('event', 'Interaction', {
+        'event_category' : 'Chart',
+        'event_action' : chartName
+    });
+}
+
 const catchDataSource = Sintium.dataSource({
     useThread: true,
     useCrossfilter: true,
@@ -242,6 +249,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 15, 50, 30],
             translateLabels: [-20, 20]
         });
+        temperatureChart.getChart().on("filtered", () => sendFilteredGAEvent("temperature"));
 
         const airPressureChart = Sintium.boxPlot({
             domId: "air-pressure",
@@ -264,6 +272,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 15, 50, 30],
             translateLabels: [-20, 20],
         });
+        airPressureChart.getChart().on("filtered", () => sendFilteredGAEvent("air pressure"));
 
         const toolsChart = Sintium.pieChart({
             domId: "redskap",
@@ -286,6 +295,7 @@ fetch("/data/fangstfelt.json")
             },
             colorScheme: Sintium.colorScheme.BASIC
         });
+        toolsChart.getChart().on("filtered", () => sendFilteredGAEvent("tools"));
 
         const speciesChart = Sintium.pieChart({
             domId: "art",
@@ -308,6 +318,7 @@ fetch("/data/fangstfelt.json")
             },
             colorScheme: Sintium.colorScheme.SPECTRAL
         });
+        speciesChart.getChart().on("filtered", () => sendFilteredGAEvent("species"));
 
         const vesselSizeChart = Sintium.barChart({
             domId: "lengde",
@@ -340,6 +351,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 20, 10, 80],
             colorScheme: Sintium.colorScheme.BASIC
         });
+        vesselSizeChart.getChart().on("filtered", () => sendFilteredGAEvent("vessel size"));
 
         const monthsChart = Sintium.barChart({
             domId: "months-chart",
@@ -373,6 +385,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 20, 10, 80],
             colorScheme: Sintium.colorScheme.BASIC
         });
+        monthsChart.getChart().on("filtered", () => sendFilteredGAEvent("months"));
 
         const qualityChart = Sintium.barChart({
             domId: "kvalitet",
@@ -410,7 +423,8 @@ fetch("/data/fangstfelt.json")
             margins: [10, 20, 10, 100],
             colorScheme: Sintium.colorScheme.BASIC
         });
-
+        qualityChart.getChart().on("filtered", () => sendFilteredGAEvent("quality"));
+        
         const timeLineBarChart = Sintium.barChart({
             domId: "timeline",
             dataSource: catchDataSource,
@@ -434,6 +448,7 @@ fetch("/data/fangstfelt.json")
             },
             centerBar: true
         });
+        timeLineBarChart.getChart().on("filtered", () => sendFilteredGAEvent("timeline"));
 
         const windRose = Sintium.windRose({
             domId: "wind-rose",
@@ -445,7 +460,7 @@ fetch("/data/fangstfelt.json")
             latColumn: "latitude",
             lonColumn: "longitude"
         });
-
+        
         playWidget.on('start-play', function () {
             timeLineBarChart.lockY(true);
             monthsChart.lockYAt(playWidget.getMaxForColumns("rundvekt", ["year"]));
@@ -454,6 +469,17 @@ fetch("/data/fangstfelt.json")
             airPressureChart.lockAxes(true);
             temperatureChart.lockAxes(true);
             topElement.show(true);
+            gtag('event', 'Interaction', {
+                'event_category' : 'Timeslider',
+                'event_action' : "play"
+            });
+        });
+
+        playWidget.on('pause-play', function() {
+            gtag('event', 'Interaction', {
+                'event_category' : 'Timeslider',
+                'event_action' : "pause"
+            });
         });
 
         playWidget.on('stop-play', function () {
@@ -464,6 +490,10 @@ fetch("/data/fangstfelt.json")
             airPressureChart.lockAxes(false);
             temperatureChart.lockAxes(false);
             topElement.show(false);
+            gtag('event', 'Interaction', {
+                'event_category' : 'Timeslider',
+                'event_action' : "stop"
+            });
         });
 
         playWidget.on('playing', function (message) {
@@ -555,7 +585,13 @@ fetch("/data/fangstfelt.json")
             windDataSource: windDataSource,
             downloadLimit: MONTHS_DOWNLOAD_LIMIT
         });
-
+        
+        dataSelector.on("update", ({years, months}) => {
+            gtag('event', 'Searched_time', {
+            'event_category' : 'Search button clicked',
+                'event_action' : `${years.join(",")};${months.join(",")}`,
+            });
+        });
 
         const widgetDrawer = Sintium.drawer({
             buttonControl: Sintium.buttonControl({
@@ -585,7 +621,15 @@ fetch("/data/fangstfelt.json")
         mapReduceLayer.addSelection({
             selector: "single",
             condition: "click",
-            filter: true
+            filter: true,
+            callback: e => {
+                const record = e.popRecord();
+                gtag('event', 'Interaction', {
+                    'event_category' : 'Map',
+                    'event_action' : "click",
+                    'value': record.get("fangstfelt")
+                });
+            }
         });
 
         mapReduceLayer.addSelection({
@@ -614,12 +658,9 @@ fetch("/data/fangstfelt.json")
             const visible = !seaMapLayerToggle.isActive();
             seaMapLayerToggle.setActive(visible);
             seaMapLayer.setVisible(visible);
-            ga('send', {
-                hitType: 'event',
-                eventCategory: 'Map',
-                eventAction: 'BaseLayerChanged',
-                eventLabel: 'interaction',
-                eventValue: 1
+            gtag('event', 'Interaction', {
+                'event_category' : 'Map',
+                'event_action' : "BaseLayerChanged"
             });
         });
         
@@ -682,11 +723,9 @@ fetch("/data/fangstfelt.json")
                 const catchAreaFilterString = currentCatchAreaFilters.join(',');
                 downloadUrl += `&catchAreas=${catchAreaFilterString}`;
             }
-            ga('send', {
-                hitType: 'event',
-                eventCategory: 'detailed_info',
-                eventAction: downloadUrl,
-                eventLabel: 'download'
+            gtag('event', 'detailed_info', {
+                'event_category' : 'download',
+                'event_action' : downloadUrl
             });
             return downloadUrl;
         }
