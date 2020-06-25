@@ -1,63 +1,95 @@
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Fiskinfo.Fangstanalyse.API.ViewModels;
 using Fiskinfo.Fangstanalyse.Infrastructure;
-using Fiskinfo.Fangstanalyse.Infrastructure.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.EvaluatableExpressionFilters.Internal;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
 using SintefSecure.Framework.SintefSecure.AspNetCore;
 
 namespace Fiskinfo.Fangstanalyse.API.Commands
 {
-    public interface IGetOptimizedCatchDataByDate : IAsyncCommand<string, string>{}
-    
+    public interface IGetOptimizedCatchDataByDate : IAsyncCommand<string, string>
+    {
+    }
+
     public class GetOptimizedCatchDataByDate : IGetOptimizedCatchDataByDate
     {
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly FangstanalyseContext _context;
-        
-        public GetOptimizedCatchDataByDate(IActionContextAccessor actionContextAccessor, FangstanalyseContext context)
+        private readonly IConfiguration _configuration;
+
+        public GetOptimizedCatchDataByDate(IActionContextAccessor actionContextAccessor, FangstanalyseContext context,
+            IConfiguration configuration)
         {
             _actionContextAccessor = actionContextAccessor;
             _context = context;
+            _configuration = configuration;
         }
-        
+
         //MIMIC OF OLD API
         public async Task<IActionResult> ExecuteAsync(string year, string month, CancellationToken cancellationToken)
         {
             // var retval = new List<OptimizedCatchData>();
-            int[] months = month.Split("-").Select(int.Parse).ToArray();
-            int[] years = year.Split("-").Select(int.Parse).ToArray();
-            
-            //This is slower than the foreach version but a bit cleaner imho... TODO: Reeview
-            var retval = await _context.OptimizedCatchData.Where(
-                note => years.Contains(note.year) && months.Contains(note.month)
-            ).Select(x => new OptimizedCatchDataViewModel()
-            {
-                rundvekt = x.rundvekt,
-                fangstfelt = x.fangstfelt,
-                art = x.art,
-                dato = x.dato,
-                lengdegruppe = x.lengdekode,
-                kvalitetkode = x.kvalitetkode,
-                redskapkode = x.redskap,
-                temperatur = x.temperatur,
-                lufttrykk = x.lufttrykk
-            }).ToListAsync(cancellationToken);
+            //          int[] months = month.Split("-").Select(int.Parse).ToArray();
+            //         int[] years = year.Split("-").Select(int.Parse).ToArray();
+            string compiledYears = year.Replace("-", ",");
+            string compiledMonths = month.Replace("-", ",");
 
-            /*foreach (var y in year.Split("-"))
+
+            //           Stopwatch sw = new Stopwatch();
+            //           sw.Start();
+            /*           var retval = await _context.OptimizedCatchData.Where(
+                          note => years.Contains(note.year) && months.Contains(note.month)
+                      ).Select(x => new OptimizedCatchDataViewModel()
+                      {
+                          rundvekt = x.rundvekt,
+                          fangstfelt = x.fangstfelt,
+                          art = x.art,
+                          dato = x.dato,
+                          lengdegruppe = x.lengdekode,
+                          kvalitetkode = x.kvalitetkode,
+                          redskapkode = x.redskap,
+                          temperatur = x.temperatur,
+                          lufttrykk = x.lufttrykk
+                      }).AsNoTracking().ToListAsync(cancellationToken);
+                      sw.Stop();
+          */
+
+            List<OptimizedCatchDataViewModel> retval = new List<OptimizedCatchDataViewModel>();
+            using (NpgsqlConnection connection =
+                new NpgsqlConnection(_configuration.GetConnectionString("FangstanalyseConnection")))
             {
-                var serr = await _context.OptimizedCatchData.Where(
-                    note => note.timestamp.Year == int.Parse(y) &&
-                            months.Contains(note.timestamp.Month)).ToListAsync(cancellationToken);
-                retval.AddRange(serr);
-            }*/
+                string query =
+                    $"SELECT CAST(note.rundvekt AS double precision) AS rundvekt, note.fangstfelt, note.art, note.dato, note.lengdekode AS lengdegruppe, note.kvalitetkode, note.redskap AS redskapkode, note.temperatur, note.lufttrykk FROM monthly_aggregated_grouped_catch_data AS note WHERE note.year IN ({compiledYears}) AND note.month IN ({compiledMonths})";
+                using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
+                {
+                    connection.Open();
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            retval.Add(new OptimizedCatchDataViewModel()
+                            {
+                                rundvekt = reader.GetDouble(reader.GetOrdinal("rundvekt")),
+                                fangstfelt = reader.GetString(reader.GetOrdinal("fangstfelt")),
+                                art = reader.GetString(reader.GetOrdinal("art")),
+                                dato = reader.GetDateTime(reader.GetOrdinal("dato")),
+                                lengdegruppe = reader.GetInt32(reader.GetOrdinal("lengdegruppe")),
+                                kvalitetkode = reader.GetInt32(reader.GetOrdinal("kvalitetkode")),
+                                redskapkode = reader.GetInt32(reader.GetOrdinal("redskapkode")),
+                                temperatur = reader.GetDouble(reader.GetOrdinal("temperatur")),
+                                lufttrykk = reader.GetDouble(reader.GetOrdinal("lufttrykk"))
+                            });
+                        }
+                    }
+                }
+            }
+
+            //          sw.Stop();
+            //         Console.WriteLine("Elapsed time # 1 " + sw.ElapsedMilliseconds);
             return new OkObjectResult(retval);
         }
     }
