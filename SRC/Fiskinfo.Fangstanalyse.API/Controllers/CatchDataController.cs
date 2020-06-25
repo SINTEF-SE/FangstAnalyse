@@ -114,7 +114,7 @@ namespace Fiskinfo.Fangstanalyse.API.Controllers
             CancellationToken cancellationToken) => command.ExecuteAsync(year, month, cancellationToken);
 
         [HttpGet(Name = CatchDataControllerRoute.GetCatchDataInteroperable + "test")]
-        public ActionResult<List<OptimizedCatchDataViewModel>> GetBitchData([FromServices] IConfiguration configuration, string year, string month)
+        public ActionResult<List<OptimizedCatchDataViewModel>> GetUnadulterated([FromServices] IConfiguration configuration, string year, string month)
         {
             string compiledYears = year.Replace("-", ",");
             Stopwatch sw = new Stopwatch();
