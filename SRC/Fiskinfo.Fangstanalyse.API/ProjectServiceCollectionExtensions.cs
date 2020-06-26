@@ -18,14 +18,8 @@ namespace Fiskinfo.Fangstanalyse.API
     {
         public static IServiceCollection AddProjectCommands(this IServiceCollection services) =>
             services
-                .AddSingleton<IGetFangstDataRaw, GetFangstDataRaw>()
-                .AddSingleton<IGetOptimizedFieldsCommand, GetOptimizedFieldsCommand>()
-                .AddSingleton<IGenerateHighPerformanceSqlCommand, GenerateHighPerformanceSqlCommand>()
                 .AddScoped<IGetOptimizedCatchDataByDate, GetOptimizedCatchDataByDate>()
-                .AddSingleton<IGetAllOptimizedCatchDataCommand, GetAllOptimizedCatchDataCommand>()
-                .AddSingleton<IGetAllFangstDataRaw, GetAllFangstDataRaw>()
                 .AddScoped<IGetWindData, GetWindData>()
-                .AddScoped<IGetTemperatureAndAirPressureData, GetTemperatureAndAirPressureData>()
                 .AddScoped<IGetDetailedCatchDataByDate, GetDetailedFilteredCatchData>();
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
