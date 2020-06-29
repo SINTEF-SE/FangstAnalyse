@@ -175,13 +175,15 @@ function sendFilteredGAEvent(chartName) {
 const catchDataSource = Sintium.dataSource({
     useThread: true,
     useCrossfilter: true,
-    csvHasHeader: true
+    csvHasHeader: true,
+    labels: ["rundvekt", "fangstfelt", "art", "dato", "lengdegruppe", "kvalitetkode", "redskapkode", "temperatur", "lufttrykk"]
 });
 
 const windDataSource = Sintium.dataSource({
     useThread: true,
     useCrossfilter: true,
-    csvHasHeader: true
+    csvHasHeader: true,
+    labels: ["datetime", "latitude", "longitude", "wind_direction_10m", "wind_speed_10m"]
 });
 
 const legendControl = Sintium.legendControl({
@@ -192,8 +194,6 @@ const legendControl = Sintium.legendControl({
     position: "top-left",
     flow: "vertical"
 });
-
-let test;
 
 fetch("/data/fangstfelt.json")
     .then(result => result.json())
@@ -351,7 +351,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 20, 10, 80],
             colorScheme: Sintium.colorScheme.BASIC
         });
-        vesselSizeChart.getChart().on("filtered", () => sendFilteredGAEvent("vessel size"));
+        vesselSizeChart.on("filtered", () => sendFilteredGAEvent("vessel size"));
 
         const monthsChart = Sintium.barChart({
             domId: "months-chart",
@@ -372,11 +372,9 @@ fetch("/data/fangstfelt.json")
             titleFunction: function (d) {
                 let title = `${d.key} ${d.layer}`;
                 let keys = Object.keys(d.value);
-
                 for (let i = 0, len = keys.length; i < len; i++) {
                     title += `\n${keys[i]}: ${d.value[keys[i]]} kg`;
                 }
-
                 return title;
             },
             brushOn: false,
@@ -385,7 +383,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 20, 10, 80],
             colorScheme: Sintium.colorScheme.BASIC
         });
-        monthsChart.getChart().on("filtered", () => sendFilteredGAEvent("months"));
+        monthsChart.on("filtered", () => sendFilteredGAEvent("months"));
 
         const qualityChart = Sintium.barChart({
             domId: "kvalitet",
@@ -414,7 +412,6 @@ fetch("/data/fangstfelt.json")
                 for (let i = 0, len = keys.length; i < len; i++) {
                     title += `\n${qualityLookup[keys[i]]}: ${d.value[keys[i]]} kg`;
                 }
-
                 return title;
             },
             brushOn: false,
@@ -423,7 +420,7 @@ fetch("/data/fangstfelt.json")
             margins: [10, 20, 10, 100],
             colorScheme: Sintium.colorScheme.BASIC
         });
-        qualityChart.getChart().on("filtered", () => sendFilteredGAEvent("quality"));
+        qualityChart.on("filtered", () => sendFilteredGAEvent("quality"));
         
         const timeLineBarChart = Sintium.barChart({
             domId: "timeline",
@@ -448,7 +445,7 @@ fetch("/data/fangstfelt.json")
             },
             centerBar: true
         });
-        timeLineBarChart.getChart().on("filtered", () => sendFilteredGAEvent("timeline"));
+        timeLineBarChart.on("filtered", () => sendFilteredGAEvent("timeline"));
 
         const windRose = Sintium.windRose({
             domId: "wind-rose",
@@ -583,9 +580,10 @@ fetch("/data/fangstfelt.json")
             windDataUrl: `${BASE_WIND_URL}?years={{year}}&months={{month}}`,
             catchDataSource: catchDataSource,
             windDataSource: windDataSource,
-            downloadLimit: MONTHS_DOWNLOAD_LIMIT
+            downloadLimit: MONTHS_DOWNLOAD_LIMIT,
+            chunkSize: 3000
         });
-        
+
         dataSelector.on("update", ({years, months}) => {
             gtag('event', 'Searched_time', {
             'event_category' : 'Search button clicked',
@@ -811,12 +809,11 @@ fetch("/data/fangstfelt.json")
 
             if(compareObjects(windLookup, lookup)) {
                 windDateDimension.filter(null);
-            } else if(dataSelector._downloading()) {
+            } else if(dataSelector.downloading()) {
                 Object.keys(dataSelector._selectedYears).forEach(
                     year => Object.keys(dataSelector._selectedMonths).forEach(
                         month => lookup[`${year}-${month}`] = dataSelector._selectedYears[year]
                     ));
-
                 windDateDimension.filter(key => !!lookup[key]);
             } else if(Object.keys(lookup).length > 0) {
                 windDateDimension.filter(key => !!lookup[key]);
