@@ -103,7 +103,7 @@ namespace Fiskinfo.Fangstanalyse.API.Controllers
             //          sw.Stop();
             //         Console.WriteLine("Elapsed time # 1 " + sw.ElapsedMilliseconds);
             StringBuilder sb = new StringBuilder();
-            sb.Append(retval[0].GetCsvHeaders());
+            sb.Append(retval[0].GetCsvHeader());
             sw2.Start();
             foreach (OptimizedCatchDataViewModel viewModel in retval)
             {
