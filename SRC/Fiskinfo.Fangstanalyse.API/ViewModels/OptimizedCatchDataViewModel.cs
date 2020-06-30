@@ -24,7 +24,7 @@ namespace Fiskinfo.Fangstanalyse.API.ViewModels
         }
         public string GetFormattedCsvLine()
         {
-            return $"{rundvekt}, {fangstfelt}, {art}, {dato}, {lengdegruppe}, {kvalitetkode}, {redskapkode}, {temperatur}, {lufttrykk} + \n";
+            return $"{rundvekt},{fangstfelt},{art},{dato},{lengdegruppe},{kvalitetkode},{redskapkode},{temperatur},{lufttrykk}\n";
         }
     }
 }
