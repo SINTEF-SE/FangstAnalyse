@@ -122,7 +122,7 @@ function hasFailedData() {
 }
 
 function checkIfStreamedAll() {
-    return keys.every(key => keysStreamed[CATCH][key] && keysStreamed[WIND][key]);
+    return keys.every(key => keysStreamed[CATCH][key] && (keysStreamed[WIND][key] || key.split("-")[0] <= "2013"));
 }
 
 function streamChunksIfAny(chunkSize) {
