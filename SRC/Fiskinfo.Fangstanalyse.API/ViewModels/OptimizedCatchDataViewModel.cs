@@ -18,13 +18,13 @@ namespace Fiskinfo.Fangstanalyse.API.ViewModels
         public double lufttrykk{ get; set; }
 
         
-        public string[] GetCsvHeaders()
+        public string[] GetCsvHeader()
         {
             return new[] { "rundvekt", "fangstfelt", "art", "dato", "lengdegruppe", "kvalitetkode", "redskapkode", "temperatur", "lufttrykk" + "\n"};
         }
         public string GetFormattedCsvLine()
         {
-            return $"{rundvekt}, {fangstfelt}, {art}, {dato}, {lengdegruppe}, {kvalitetkode}, {redskapkode}, {temperatur}, {lufttrykk} + \n";
+            return $"{rundvekt},{fangstfelt},{art},{dato},{lengdegruppe},{kvalitetkode},{redskapkode},{temperatur},{lufttrykk}\n";
         }
     }
 }

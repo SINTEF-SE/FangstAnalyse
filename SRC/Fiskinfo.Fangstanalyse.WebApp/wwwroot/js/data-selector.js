@@ -17,16 +17,46 @@ class DataSelector {
         this._updateButton = null;
         this._selectedMonths = {};
         this._selectedYears = {};
-        this._downloadCount = false;
-        this._catchData = {};
         this._inCatchDataSource = {};
-        this._windData = {};
         this._inWindDataSource = {};
         this._dimension = null;
         this._initializeDataSelectorElements(domId);
         this._setupButtonEvents();
         this._addItems();
         this._eventCallbacks = {};
+        this._dataWorker = new Worker('js/data-worker.js');
+        this._downloading = false;
+        this._setupDataWorkerEvents(options);
+    }
+    
+    downloading() {
+        return this._downloading;
+    }
+    
+    _setupDataWorkerEvents(options) {
+        const { catchDataUrl, windDataUrl, chunkSize } = options;
+        this._dataWorker.postMessage({
+            action: "initialize",
+            catchUrl: catchDataUrl,
+            windUrl: windDataUrl,
+            chunkSize: chunkSize,
+        });
+        this._dataWorker.onmessage = function(e) {
+            const { action, chunk, key } = e.data;
+            switch (action) {
+                case "chunk-catch":
+                    options.catchDataSource.addData(chunk);
+                    this._inCatchDataSource[key] = true;
+                    break;
+                case "chunk-wind":
+                    options.windDataSource.addData(chunk);
+                    this._inWindDataSource[key] = true;
+                    break;
+                case "done":
+                    this._doneDownloading();
+                    break;
+            }
+        }.bind(this);
     }
 
     _initializeDataSelectorElements(domId) {
@@ -80,7 +110,6 @@ class DataSelector {
         this._dataSelectorElement
             .querySelector('.fa-data-selector-row .update')
             .addEventListener('click', this._updateData.bind(this));
-
     }
 
     _addItems() {
@@ -97,7 +126,7 @@ class DataSelector {
         itemElement.classList.add('item');
         itemElement.innerText = value;
         itemElement.addEventListener('click', () => {
-            if (this._downloading()) return;
+            if (this.downloading()) return;
             const selected = !itemElement.classList.contains(SELECTED);
             if (!parentElement.classList.contains(DISABLED) || !selected) {
                 itemElement.classList.toggle(SELECTED, selected);
@@ -109,47 +138,46 @@ class DataSelector {
     }
 
     _updateData() {
-        const removeKeys = this._getKeysToRemoveFromDataSource();
-        this._removeFromCatchDataSource(removeKeys);
-        this._removeFromWindDataSource(removeKeys);
-        if (this._downloading()) return;
+        if (this.downloading()) return;
         this._monthsElement.classList.add('disabled');
         this._yearsElement.classList.add('disabled');
         this._updateButton.setAttribute("disabled", "true");
-        this._downloadCount = this._getDownloadCount();
         this._dataSelectorElement.classList.add('downloading');
-        let currentDate = new Date();
 
         this.trigger("update", {
             years: this._getSelectedYears(),
             months: Object.keys(this._selectedMonths).map(key => this._months.indexOf(key) + 1)
         });
 
+        const removeKeys = this._getKeysToRemoveFromDataSource();
+        const addKeys = this._getNecessaryKeys();
+
+        if (removeKeys.length > 0) {
+            this._removeFromCatchDataSource(removeKeys);
+            this._removeFromWindDataSource(removeKeys);
+        }
+
+        this._dataWorker.postMessage({
+            action: "fetch",
+            keys: addKeys,
+        });
+
+        this._updateState();
+        this._downloading = true;
+    }
+    
+    _getNecessaryKeys() {
+        const keys = [];
         for (const year of this._getSelectedYears()) {
             for (let month of this._getSelectedMonths()) {
                 month = this._months.indexOf(month) + 1;
-
-                // Ignore requests for future data.
-                if(year === currentDate.getFullYear() && month > currentDate.getMonth()) {
-                    this._downloadCount -= 1;
-                    continue;
-                }
-
-                this._getCatchData(year, month, data => {
-                    this._addToCatchDataSourceIfNecessary(year, month, data);
-                    this._downloadCount -= 1;
-                    if (!this._downloading()) {
-                        this._doneDownloading();
-                    }
-                });
-
-                if (year > 2013) {
-                    this._getWindData(year, month, data => {
-                        this._addToWindDataSourceIfNecessary(year, month, data);
-                    });
+                const key = `${year}-${month}`;
+                if (!this._inCatchDataSource[key]) {
+                    keys.push(key);
                 }
             }
         }
+        return keys;
     }
 
     _getKeysToRemoveFromDataSource() {
@@ -170,38 +198,15 @@ class DataSelector {
     }
 
     _doneDownloading() {
+        this._downloading = false;
         this._monthsElement.classList.remove('disabled');
         this._yearsElement.classList.remove('disabled');
         this._dataSelectorElement.classList.remove('downloading');
         this._updateState();
     }
 
-    _getDownloadCount() {
-        return this._getSelectedYears().length*this._getSelectedMonths().length;
-    }
-
-    _markCatchDataAsDownloaded(year, month, data) {
-        const key = `${year}-${month}`;
-        this._catchData[key] = data;
-    }
-
-    _markWindDataAsDownloaded(year, month, data) {
-        const key = `${year}-${month}`;
-        this._windData[key] = data;
-    }
-
-    _isCatchDataDownloaded(year, month) {
-        const key = `${year}-${month}`;
-        return !!this._catchData[key];
-    }
-
-    _isWindDataDownloaded(year, month) {
-        const key = `${year}-${month}`;
-        return !!this._windData[key];
-    }
-
     _removeFromCatchDataSource(removeKeys) {
-        removeKeys.forEach(key => this._inCatchDataSource[key] =false);
+        removeKeys.forEach(key => this._inCatchDataSource[key] = false);
         this._removeFromDataSource(this._options.catchDataSource, removeKeys);
     }
 
@@ -219,88 +224,7 @@ class DataSelector {
                 const key = `${date.getFullYear()}-${date.getMonth() + 1}`;
                 return removeKeys.indexOf(key) >= 0;
             });
-    }
-
-    _addToCatchDataSourceIfNecessary(year, month, data) {
-        const key = `${year}-${month}`;
-        if (!this._inCatchDataSource[key]) {
-            this._options.catchDataSource.addData(data);
-            this._inCatchDataSource[key] = true;
-        }
-    }
-
-    _addToWindDataSourceIfNecessary(year, month, data) {
-        const key = `${year}-${month}`;
-
-        if (!this._inWindDataSource[key]) {
-            this._options.windDataSource.addData(data);
-            this._inWindDataSource[key] = true;
-        }
-    }
-
-    _getCatchData(year, month, callback) {
-        if (this._isCatchDataDownloaded(year, month)) {
-            const data = this._catchData[`${year}-${month}`];
-            callback(data);
-        } else {
-            const url = this._getCatchDataUrl(year, month);
-
-            fetch(url, {
-                headers: HEADERS
-            })
-                .then(data => data.text())
-                .then(text => {
-                    this._markCatchDataAsDownloaded(year, month, text);
-
-                    if (text.length > 0) {
-                        callback(text);
-                    }
-                });
-        }
-    }
-
-    _getCatchDataUrl(year, month) {
-        let { catchDataUrl: url } = this._options;
-        url = url.replace('{{year}}', year);
-        url = url.replace('{{month}}', month);
-        return url;
-    }
-
-    _getWindData(year, month, callback) {
-        if (this._isWindDataDownloaded(year, month)) {
-            const data = this._windData[`${year}-${month}`];
-            callback(data);
-        } else {
-            const url = this._getWindDataUrl(year, month);
-
-            fetch(url, {
-                headers: HEADERS
-            })
-                .then(data => data.text())
-                .then(text => {
-                    this._markWindDataAsDownloaded(year, month, text);
-
-                    if (text.length > 0) {
-                        callback(text);
-                    }
-
-                    if (!this._downloading()) {
-                        this._doneDownloading();
-                    }
-                });
-        }
-
-    }
-
-    _getWindDataUrl(year, month) {
-        let { windDataUrl: url } = this._options;
-        url = url.replace('{{year}}', year);
-        url = url.replace('{{month}}', month);
-        return url;
-    }
-
-    _downloading() {
-        return this._downloadCount > 0;
+        dc.redrawAll();
     }
 
     _shouldUpdate() {
