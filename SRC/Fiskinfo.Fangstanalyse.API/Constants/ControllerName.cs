@@ -2,7 +2,6 @@
 {
     public static class ControllerName
     {
-        public const string Car = nameof(Car);
         public const string Status = nameof(Status);
         public const string Authorization = nameof(Authorization);
         public const string CatchData = nameof(CatchData);

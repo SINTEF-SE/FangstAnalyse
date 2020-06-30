@@ -61,60 +61,8 @@ namespace Fiskinfo.Fangstanalyse.API.Controllers
             return Ok();
         }
 
-        /// <summary>
-        /// Gets the catch report with the specified unique identifier.
-        /// </summary>
-        /// <param name="command">The action command.</param>
-        /// <param name="catchReportId">The catch reports' unique identifier.</param>
-        /// <param name="cancellationToken">The cancellation token used to cancel the HTTP request.</param>
-        /// <returns>A 200 OK response containing the catch report or a 404 Not Found if a catch report with the specified unique
-        /// identifier was not found.</returns>
-        [HttpGet("{catchReportId}", Name = CatchDataControllerRoute.GetCatchData)]
-        [HttpHead("{catchReportId}", Name = CatchDataControllerRoute.HeadCatchData)]
-        [SwaggerResponse(StatusCodes.Status200OK, "The catch report with the specified unique identifier.", typeof(FangstDataRaw))]
-        [SwaggerResponse(StatusCodes.Status304NotModified, "The catch report has not changed since the date given in the If-Modified-Since HTTP header.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "A catch report with the specified unique identifier could not be found.")]
-        [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The specified Accept MIME type is not acceptable.")]
-        public Task<IActionResult> Get(
-            [FromServices] IGetFangstDataRaw command,
-            int catchReportId,
-            CancellationToken cancellationToken) => command.ExecuteAsync(catchReportId, cancellationToken);
-
-        /// <summary>
-        /// Get all catch reports with all columns.
-        /// </summary>
-        /// <param name="command">The action command.</param>
-        /// <param name="cancellationToken">The cancellation token used to cancel the HTTP request.</param>
-        /// <returns>A 200 OK response containing all catch reports or a 404 Not Found if there is no catch reports in the system.</returns>
-        [HttpGet(Name = CatchDataControllerRoute.GetCatchDataPage)]
-        [SwaggerResponse(StatusCodes.Status200OK, "The catch report with the specified unique identifier.", typeof(List<FangstDataRaw>))]
-        [SwaggerResponse(StatusCodes.Status304NotModified, "The catch report has not changed since the date given in the If-Modified-Since HTTP header.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "A catch report with the specified unique identifier could not be found.")]
-        [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The specified Accept MIME type is not acceptable.")]
-        public Task<IActionResult> GetAll(
-            [FromServices] IGetAllFangstDataRaw command,
-            CancellationToken cancellationToken) => command.ExecuteAsync(cancellationToken);
-
-        /// <summary>
-        /// Get catch reports with a subset of data within a given time range
-        /// </summary>
-        /// <param name="command">The action command.</param>
-        /// <param name="month">Month to fetch data from</param>
-        /// <param name="cancellationToken">The cancellation token used to cancel the HTTP request.</param>
-        /// <param name="year">The year to fetch data from</param>
-        /// <returns>A 200 OK response containing all catch reports or a 404 Not Found if there is no catch reports in the system.</returns>
-        [HttpGet(Name = CatchDataControllerRoute.GetCatchDataInteroperable)]
-        [SwaggerResponse(StatusCodes.Status200OK, "The catch report with the specified unique identifier.", typeof(List<FangstDataRaw>))]
-        [SwaggerResponse(StatusCodes.Status304NotModified, "The catch report has not changed since the date given in the If-Modified-Since HTTP header.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "A catch report with the specified unique identifier could not be found.")]
-        [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The specified Accept MIME type is not acceptable.")]
-        public Task<IActionResult> GetCatchDataInteroperable(
-            [FromServices] IGetOptimizedFieldsCommand command,
-            string year, string month,
-            CancellationToken cancellationToken) => command.ExecuteAsync(year, month, cancellationToken);
-
         [HttpGet(Name = CatchDataControllerRoute.GetCatchDataInteroperable + "test")]
-        public ActionResult<List<OptimizedCatchDataViewModel>> GetBitchData([FromServices] IConfiguration configuration, string year, string month)
+        public ActionResult<List<OptimizedCatchDataViewModel>> GetCatchDataUsingSQL([FromServices] IConfiguration configuration, string year, string month)
         {
             string compiledYears = year.Replace("-", ",");
             Stopwatch sw = new Stopwatch();
