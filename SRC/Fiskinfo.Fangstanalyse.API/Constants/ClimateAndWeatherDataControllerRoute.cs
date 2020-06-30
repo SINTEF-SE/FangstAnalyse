@@ -8,6 +8,5 @@ namespace Fiskinfo.Fangstanalyse.API.Constants
     public class ClimateAndWeatherDataControllerRoute
     {
         public const string GetWindData = ControllerName.ClimateAndWeatherData + nameof(GetWindData);
-        public const string GetTemperatureAndAirPressureData = ControllerName.ClimateAndWeatherData + nameof(GetTemperatureAndAirPressureData);
     }
 }

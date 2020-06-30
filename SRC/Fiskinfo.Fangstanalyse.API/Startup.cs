@@ -92,7 +92,8 @@ namespace Fiskinfo.Fangstanalyse.API
 
             } else
             {
-                application.UseCors(CorsPolicyName.AllowProd);
+                application.UseCors(CorsPolicyName.AllowAny);
+                //application.UseCors(CorsPolicyName.AllowProd);
             }
             
             application

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Fiskinfo.Fangstanalyse.API.Commands;
@@ -51,24 +51,6 @@ namespace Fiskinfo.Fangstanalyse.API.Controllers
         [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The specified Accept MIME type is not acceptable.")]
         public Task<IActionResult> GetWindData(
             [FromServices] IGetWindData command,
-            string years, string months,
-            CancellationToken cancellationToken) => command.ExecuteAsync(years, months, cancellationToken);
-
-        /// <summary>
-        /// Get temperature and air pressure data for a given time
-        /// </summary>
-        /// <param name="command">The action command.</param>
-        /// <param name="years">The year(s) to fetch data from</param>
-        /// <param name="months">Month(s) to fetch data from</param>
-        /// <param name="cancellationToken">The cancellation token used to cancel the HTTP request.</param>
-        /// <returns>A 200 OK response containing requested temperature and air pressure data or a 404 Not Found if there is no temperature and air pressure data in the system.</returns>
-        [HttpGet(Name = ClimateAndWeatherDataControllerRoute.GetTemperatureAndAirPressureData)]
-        [SwaggerResponse(StatusCodes.Status200OK, "Temperature and air pressure data within the given parameters.", typeof(List<TemperatureAndAirPressureViewModel>))]
-        [SwaggerResponse(StatusCodes.Status304NotModified, "The temperature and air pressure data has not changed since the date given in the If-Modified-Since HTTP header.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "No temperature and air pressure data within the given paramaters could be found.")]
-        [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The specified Accept MIME type is not acceptable.")]
-        public Task<IActionResult> GetTemperatureAndAirPressureData(
-            [FromServices] IGetTemperatureAndAirPressureData command,
             string years, string months,
             CancellationToken cancellationToken) => command.ExecuteAsync(years, months, cancellationToken);
     }

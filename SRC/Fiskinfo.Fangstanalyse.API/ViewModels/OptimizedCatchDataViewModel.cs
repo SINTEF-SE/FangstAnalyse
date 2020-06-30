@@ -16,5 +16,15 @@ namespace Fiskinfo.Fangstanalyse.API.ViewModels
         public int redskapkode { get; set; }
         public double temperatur { get; set; }
         public double lufttrykk{ get; set; }
+
+        
+        public string[] GetCsvHeader()
+        {
+            return new[] { "rundvekt", "fangstfelt", "art", "dato", "lengdegruppe", "kvalitetkode", "redskapkode", "temperatur", "lufttrykk" + "\n"};
+        }
+        public string GetFormattedCsvLine()
+        {
+            return $"{rundvekt},{fangstfelt},{art},{dato},{lengdegruppe},{kvalitetkode},{redskapkode},{temperatur},{lufttrykk}\n";
+        }
     }
 }
