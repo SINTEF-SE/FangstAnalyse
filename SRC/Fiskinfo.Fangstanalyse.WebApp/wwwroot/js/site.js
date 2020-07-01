@@ -227,53 +227,6 @@ fetch("/data/fangstfelt.json")
         });
 
         // CHART
-        
-        const temperatureChart = Sintium.boxPlot({
-            domId: "box-plot",
-            dataSource: catchDataSource,
-            xAxis: function(record) {
-                return Date.parse(record.get("dato"));
-            },
-            xUnits: "distinct",
-            xAxisTickFormat: function (v) {
-                const date = new Date(v);
-                return formattedDate(date);
-            },
-            yAxis: "temperatur",
-            brushOn: false,
-            lines: 'both',
-            centerBar: true,
-            rotateLabels: true,
-            padding: [0.5, 0.5],
-            elasticY: true,
-            margins: [10, 15, 50, 30],
-            translateLabels: [-20, 20]
-        });
-        temperatureChart.getChart().on("filtered", () => sendFilteredGAEvent("temperature"));
-
-        const airPressureChart = Sintium.boxPlot({
-            domId: "air-pressure",
-            dataSource: catchDataSource,
-            xAxis: function(record) {
-                return Date.parse(record.get("dato"));
-            },
-            xUnits: "distinct",
-            xAxisTickFormat: function (v) {
-                const date = new Date(v);
-                return formattedDate(date);
-            },
-            yAxis: "lufttrykk",
-            brushOn: false,
-            lines: 'both',
-            centerBar: true,
-            rotateLabels: true,
-            padding: [0.5, 0.5],
-            elasticY: true,
-            margins: [10, 15, 50, 30],
-            translateLabels: [-20, 20],
-        });
-        airPressureChart.getChart().on("filtered", () => sendFilteredGAEvent("air pressure"));
-
         const toolsChart = Sintium.pieChart({
             domId: "redskap",
             dataSource: catchDataSource,
@@ -334,7 +287,7 @@ fetch("/data/fangstfelt.json")
             yTickFormatShort: true,
             elasticX: true,
             elasticY: true,
-            useCanvas: false,
+            useCanvas: true,
             stackColumn: "year",
             titleFunction: function (d) {
                 let title = lengdeLookup[d.key];
@@ -367,7 +320,7 @@ fetch("/data/fangstfelt.json")
             yTickFormatShort: true,
             elasticX: true,
             elasticY: true,
-            useCanvas: false,
+            useCanvas: true,
             stackColumn: "year",
             titleFunction: function (d) {
                 let title = `${d.key} ${d.layer}`;
@@ -398,7 +351,8 @@ fetch("/data/fangstfelt.json")
             yTickFormatShort: true,
             elasticX: true,
             elasticY: true,
-            useCanvas: false,
+            rotateLabels: true,
+            useCanvas: true,
             stackColumn: "kvalitetkode",
             labelFunction: function (key) {
                 if (!qualityLookup[key]) {
@@ -417,7 +371,8 @@ fetch("/data/fangstfelt.json")
             brushOn: false,
             centerBar: true,
             legend: true,
-            margins: [10, 20, 10, 100],
+            margins: [10, 20, 50, 80],
+            translateLabels: [-20, 20],
             colorScheme: Sintium.colorScheme.BASIC
         });
         qualityChart.on("filtered", () => sendFilteredGAEvent("quality"));
@@ -436,16 +391,64 @@ fetch("/data/fangstfelt.json")
             brushOn: false,
             elasticX: true,
             elasticY: true,
-            margins: [10, 15, 50, 30],
+            margins: [10, 15, 50, 80],
             rotateLabels: true,
             translateLabels: [-20, 20],
-            useCanvas: false,
+            useCanvas: true,
             titleFunction: function (d) {
                 return `${formattedDate(new Date(d.key))}: ${d.value} kg`;
             },
             centerBar: true
         });
         timeLineBarChart.on("filtered", () => sendFilteredGAEvent("timeline"));
+
+        const temperatureChart = Sintium.boxPlot({
+            domId: "box-plot",
+            dataSource: catchDataSource,
+            xAxis: function(record) {
+                return Date.parse(record.get("dato"));
+            },
+            xUnits: "distinct",
+            xAxisTickFormat: function (v) {
+                const date = new Date(v);
+                return formattedDate(date);
+            },
+            yAxis: "temperatur",
+            brushOn: false,
+            lines: 'both',
+            centerBar: true,
+            rotateLabels: true,
+            padding: [0.5, 0.5],
+            elasticY: true,
+            useCanvas: true,
+            margins: [10, 15, 50, 80],
+            translateLabels: [-20, 20]
+        });
+        temperatureChart.getChart().on("filtered", () => sendFilteredGAEvent("temperature"));
+
+        const airPressureChart = Sintium.boxPlot({
+            domId: "air-pressure",
+            dataSource: catchDataSource,
+            xAxis: function(record) {
+                return Date.parse(record.get("dato"));
+            },
+            xUnits: "distinct",
+            xAxisTickFormat: function (v) {
+                const date = new Date(v);
+                return formattedDate(date);
+            },
+            yAxis: "lufttrykk",
+            brushOn: false,
+            lines: 'both',
+            centerBar: true,
+            rotateLabels: true,
+            useCanvas: true,
+            padding: [0.5, 0.5],
+            elasticY: true,
+            margins: [10, 15, 50, 80],
+            translateLabels: [-20, 20],
+        });
+        airPressureChart.getChart().on("filtered", () => sendFilteredGAEvent("air pressure"));
 
         const windRose = Sintium.windRose({
             domId: "wind-rose",
