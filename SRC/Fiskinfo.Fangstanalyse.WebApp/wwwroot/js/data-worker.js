@@ -61,12 +61,12 @@ function downloadAndQueueAllDataForStreaming(keys) {
 function downloadAndQueueDataForStreaming(key) {
     const year = key.split("-")[0];
     getData(CATCH, key)
-        .then(data => queuedData[CATCH].push({ rows: parseData(data), key }))
+        .then(data => queuedData[CATCH].push({ rows: parseData(CATCH, data), key }))
         .catch(() => failedDownloads.add(key));
 
     if (year > 2013) {
         getData(WIND, key)
-            .then(data => queuedData[WIND].push({ rows: parseData(data), key }))
+            .then(data => queuedData[WIND].push({ rows: parseData(WIND, data), key }))
             .catch(() => failedDownloads.add(key));
     }
 }
@@ -92,24 +92,27 @@ function getData(type, key, failed) {
     });
 }
 
-function parseData(data) {
+function parseData(type, data) {
     if (!!data) {
         data = data.split("\r\n");
         const headers = data.shift();
-        return data
-            .map(line => {
-                return line.split(",").map((value, index) => {
-                    switch (index) {
-                        case 0:
-                        case 7:
-                        case 8:
-                            return parseFloat(value);
-                        default:
-                            return value;
-                    }
+        if (type === CATCH) {
+            return data
+                .map(line => {
+                    return line.split(",").map((value, index) => {
+                        return index === 0 || index === 7 || index === 8 ? parseFloat(value) : value;
+                    })
                 })
-            })
-            .filter(d => d[3] != null);
+                .filter(d => d[3] != null);
+        } else if (type === WIND) {
+            return data
+                .map(line => {
+                    return line.split(",").map((value, index) => {
+                        return index > 0 ? parseFloat(value) : value;
+                    })
+                })
+                .filter(d => d[0] != null);
+        }
     }
 }
 
@@ -122,7 +125,7 @@ function hasFailedData() {
 }
 
 function checkIfStreamedAll() {
-    return keys.every(key => keysStreamed[CATCH][key] && keysStreamed[WIND][key]);
+    return keys.every(key => keysStreamed[CATCH][key] && (keysStreamed[WIND][key] || key.split("-")[0] <= "2013"));
 }
 
 function streamChunksIfAny(chunkSize) {

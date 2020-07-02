@@ -195,6 +195,8 @@ const legendControl = Sintium.legendControl({
     flow: "vertical"
 });
 
+let test;
+
 fetch("/data/fangstfelt.json")
     .then(result => result.json())
     .then(json => {
@@ -372,9 +374,11 @@ fetch("/data/fangstfelt.json")
             titleFunction: function (d) {
                 let title = `${d.key} ${d.layer}`;
                 let keys = Object.keys(d.value);
+
                 for (let i = 0, len = keys.length; i < len; i++) {
                     title += `\n${keys[i]}: ${d.value[keys[i]]} kg`;
                 }
+
                 return title;
             },
             brushOn: false,
@@ -412,6 +416,7 @@ fetch("/data/fangstfelt.json")
                 for (let i = 0, len = keys.length; i < len; i++) {
                     title += `\n${qualityLookup[keys[i]]}: ${d.value[keys[i]]} kg`;
                 }
+
                 return title;
             },
             brushOn: false,
@@ -439,13 +444,13 @@ fetch("/data/fangstfelt.json")
             margins: [10, 15, 50, 30],
             rotateLabels: true,
             translateLabels: [-20, 20],
-            useCanvas: false,
+            useCanvas: true,
             titleFunction: function (d) {
                 return `${formattedDate(new Date(d.key))}: ${d.value} kg`;
             },
             centerBar: true
         });
-        timeLineBarChart.on("filtered", () => sendFilteredGAEvent("timeline"));
+        timeLineBarChart.getChart().on("filtered", () => sendFilteredGAEvent("timeline"));
 
         const windRose = Sintium.windRose({
             domId: "wind-rose",
@@ -583,7 +588,7 @@ fetch("/data/fangstfelt.json")
             downloadLimit: MONTHS_DOWNLOAD_LIMIT,
             chunkSize: 3000
         });
-
+        
         dataSelector.on("update", ({years, months}) => {
             gtag('event', 'Searched_time', {
             'event_category' : 'Search button clicked',
@@ -814,6 +819,7 @@ fetch("/data/fangstfelt.json")
                     year => Object.keys(dataSelector._selectedMonths).forEach(
                         month => lookup[`${year}-${month}`] = dataSelector._selectedYears[year]
                     ));
+
                 windDateDimension.filter(key => !!lookup[key]);
             } else if(Object.keys(lookup).length > 0) {
                 windDateDimension.filter(key => !!lookup[key]);
