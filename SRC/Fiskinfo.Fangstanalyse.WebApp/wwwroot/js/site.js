@@ -772,7 +772,8 @@ fetch("/data/fangstfelt.json")
                 downloadControl,
                 Sintium.htmlControl({
                     html: topElement.element()
-                })
+                }),
+                Sintium.zoomControl()
             ],
             viewPortMode: Sintium.isMobile() ? 'all' : 'visible',
             keepCenter: !Sintium.isMobile(),
