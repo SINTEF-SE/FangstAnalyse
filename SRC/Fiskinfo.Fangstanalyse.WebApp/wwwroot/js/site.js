@@ -195,7 +195,24 @@ const legendControl = Sintium.legendControl({
     flow: "vertical"
 });
 
-let test;
+let catchDateDimension;
+let windDateDimension;
+
+const el = document.createElement('div');
+el.innerHTML = `
+    <div>
+        <label class="sintium-checkbox-container">
+            <input type="checkbox" value=">
+            <span class="checkmark"></span>
+        </label>
+    </div>
+    <div class="text">Sjøkart</div>
+`;
+
+const mapWidget = {
+    getHTLMElement: () => el,
+    getWidgetId: () => 'map-widget'
+};
 
 fetch("/data/fangstfelt.json")
     .then(result => result.json())
@@ -217,7 +234,8 @@ fetch("/data/fangstfelt.json")
             dataSource: catchDataSource,
             keyColumn: "dato",
             keyUnits: "distinct",
-            dateIsText: true
+            dateIsText: true,
+            timePerIteration: 4000
         });
 
         const playWidgetControl = Sintium.widgetControl({
@@ -227,6 +245,7 @@ fetch("/data/fangstfelt.json")
             height: 80,
             customStyle: true
         });
+        
 
         // CHART
         const toolsChart = Sintium.pieChart({
@@ -248,7 +267,7 @@ fetch("/data/fangstfelt.json")
             titleFunction: function (d) {
                 return `${redskapLookup[d.key]}: ${d.value} kg`;
             },
-            colorScheme: Sintium.colorScheme.BASIC
+            colorScheme: Sintium.colorScheme.HIGHCHART_DEFAULTS
         });
         toolsChart.getChart().on("filtered", () => sendFilteredGAEvent("tools"));
 
@@ -271,7 +290,7 @@ fetch("/data/fangstfelt.json")
             titleFunction: function (d) {
                 return `${artLookup[d.key]}: ${d.value} kg`;
             },
-            colorScheme: Sintium.colorScheme.SPECTRAL
+            colorScheme: Sintium.colorScheme.HIGHCHART_DEFAULTS
         });
         speciesChart.getChart().on("filtered", () => sendFilteredGAEvent("species"));
 
@@ -284,12 +303,12 @@ fetch("/data/fangstfelt.json")
                 return lengdeLookup[v];
             },
             brushOn: false,
-            centerBar: true,
+            centerBar: false,
             yAxis: "rundvekt",
             yTickFormatShort: true,
             elasticX: true,
             elasticY: true,
-            useCanvas: true,
+            useCanvas: false,
             stackColumn: "year",
             titleFunction: function (d) {
                 let title = lengdeLookup[d.key];
@@ -304,7 +323,7 @@ fetch("/data/fangstfelt.json")
             clickable: true,
             legend: true,
             margins: [10, 20, 10, 80],
-            colorScheme: Sintium.colorScheme.BASIC
+            colorScheme: Sintium.colorScheme.HIGHCHART_DEFAULTS
         });
         vesselSizeChart.on("filtered", () => sendFilteredGAEvent("vessel size"));
 
@@ -322,7 +341,7 @@ fetch("/data/fangstfelt.json")
             yTickFormatShort: true,
             elasticX: true,
             elasticY: true,
-            useCanvas: true,
+            useCanvas: false,
             stackColumn: "year",
             titleFunction: function (d) {
                 let title = `${d.key} ${d.layer}`;
@@ -335,10 +354,10 @@ fetch("/data/fangstfelt.json")
                 return title;
             },
             brushOn: false,
-            centerBar: true,
+            centerBar: false,
             legend: true,
             margins: [10, 15, 50, 80],
-            colorScheme: Sintium.colorScheme.BASIC
+            colorScheme: Sintium.colorScheme.HIGHCHART_DEFAULTS
         });
         monthsChart.on("filtered", () => sendFilteredGAEvent("months"));
 
@@ -355,7 +374,7 @@ fetch("/data/fangstfelt.json")
             yTickFormatShort: true,
             elasticX: true,
             elasticY: true,
-            useCanvas: true,
+            useCanvas: false,
             stackColumn: "kvalitetkode",
             labelFunction: function (key) {
                 if (!qualityLookup[key]) {
@@ -373,12 +392,12 @@ fetch("/data/fangstfelt.json")
                 return title;
             },
             brushOn: false,
-            centerBar: true,
+            centerBar: false,
             legend: true,
             rotateLabels: true,
             translateLabels: [-20, 20],
             margins: [10, 15, 50, 80],
-            colorScheme: Sintium.colorScheme.BASIC
+            colorScheme: Sintium.colorScheme.HIGHCHART_DEFAULTS
         });
         qualityChart.on("filtered", () => sendFilteredGAEvent("quality"));
         
@@ -399,11 +418,11 @@ fetch("/data/fangstfelt.json")
             margins: [10, 15, 50, 80],
             rotateLabels: true,
             translateLabels: [-20, 20],
-            useCanvas: true,
+            useCanvas: false,
             titleFunction: function (d) {
                 return `${formattedDate(new Date(d.key))}: ${d.value} kg`;
             },
-            centerBar: true
+            centerBar: false
         });
         timeLineBarChart.getChart().on("filtered", () => sendFilteredGAEvent("timeline"));
 
@@ -422,7 +441,7 @@ fetch("/data/fangstfelt.json")
             yAxis: "temperatur",
             brushOn: false,
             lines: 'both',
-            centerBar: true,
+            centerBar: false,
             rotateLabels: true,
             padding: [0.5, 0.5],
             elasticY: true,
@@ -445,7 +464,7 @@ fetch("/data/fangstfelt.json")
             yAxis: "lufttrykk",
             brushOn: false,
             lines: 'both',
-            centerBar: true,
+            centerBar: false,
             rotateLabels: true,
             padding: [0.5, 0.5],
             elasticY: true,
@@ -464,7 +483,7 @@ fetch("/data/fangstfelt.json")
             latColumn: "latitude",
             lonColumn: "longitude"
         });
-        
+
         playWidget.on('start-play', function () {
             timeLineBarChart.lockY(true);
             monthsChart.lockYAt(playWidget.getMaxForColumns("rundvekt", ["year"]));
@@ -506,7 +525,10 @@ fetch("/data/fangstfelt.json")
         });
 
             // WIDGET GRID
-        const grid = Sintium.widgetGrid({ domId: "grid" })
+        const grid = Sintium.widgetGrid({ 
+            domId: "grid",
+            title: "Data filter"
+        })
             .addWidget(toolsChart, {
                 title: "Redskap",
                 x: 6,
@@ -769,19 +791,26 @@ fetch("/data/fangstfelt.json")
             layers: [mapReduceLayer, seaMapLayer],
             controls: [
                 legendControl, 
-                playWidgetControl, 
                 seaMapLayerToggle, 
                 downloadControl,
+                playWidgetControl,
                 Sintium.htmlControl({
                     html: topElement.element()
                 }),
-                Sintium.zoomControl()
+                /* Sintium.locationControl({
+                    zoom: 8,
+                    position: 'top-right'
+                }), */
+                Sintium.zoomControl({
+                    position: 'top-right',
+                    index: 100,
+                })
             ],
             viewPortMode: Sintium.isMobile() ? 'all' : 'visible',
             keepCenter: !Sintium.isMobile(),
             onViewPortChange: (extent) => {
-                mapReduceLayer.filterByExtent(extent);
-                windRose.setRange(extent[1], extent[0], extent[3], extent[2]);
+                // mapReduceLayer.filterByExtent(extent);
+                // windRose.setRange(extent[1], extent[0], extent[3], extent[2]);
             },
             use: [widgetDrawer]
         });
@@ -792,11 +821,11 @@ fetch("/data/fangstfelt.json")
             }, 500);
         }
         
-        const catchDateDimension = catchDataSource.getDataContainer().getCrossfilter().dimension(d => {
+        catchDateDimension = catchDataSource.getDataContainer().getCrossfilter().dimension(d => {
             const date = new Date(d[4]);
             return `${date.getFullYear()}-${date.getMonth()}`;
         });
-        const windDateDimension = windDataSource.getDataContainer().getCrossfilter().dimension(d => {
+        windDateDimension = windDataSource.getDataContainer().getCrossfilter().dimension(d => {
             const date = new Date(d[1]);
             return `${date.getFullYear()}-${date.getMonth()}`;
         });

@@ -28,6 +28,9 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\css\select.scss" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\css\splash_scene.css" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\css\ui.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\LocationSwitcher\Implementations\SelectLocationSwitcher.ts" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\LocationSwitcher\Interfaces\ILocationSwitcherOptions.ts" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\LocationSwitcher\Models\MapLocation.ts" />
     </ItemGroup>
 
 
