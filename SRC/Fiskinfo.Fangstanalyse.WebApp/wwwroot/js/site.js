@@ -140,7 +140,7 @@ function onMapReduceLayerDataChange(data) {
             total += data[key].sum.rundvekt;
             styleOpacity[key] = data[key].sum.rundvekt/max;
         });
-    legendControl.setMax(total);
+    legendControl.setMax(max);
 }
 
 function updateSearchButtonStatus() {
@@ -797,10 +797,10 @@ fetch("/data/fangstfelt.json")
                 Sintium.htmlControl({
                     html: topElement.element()
                 }),
-                /* Sintium.locationControl({
+                Sintium.locationControl({
                     zoom: 8,
                     position: 'top-right'
-                }), */
+                }),
                 Sintium.zoomControl({
                     position: 'top-right',
                     index: 100,
@@ -809,17 +809,21 @@ fetch("/data/fangstfelt.json")
             viewPortMode: Sintium.isMobile() ? 'all' : 'visible',
             keepCenter: !Sintium.isMobile(),
             onViewPortChange: (extent) => {
-                // mapReduceLayer.filterByExtent(extent);
-                // windRose.setRange(extent[1], extent[0], extent[3], extent[2]);
+                mapReduceLayer.filterByExtent(extent);
+                windRose.setRange(extent[1], extent[0], extent[3], extent[2]);
             },
-            use: [widgetDrawer]
+            use: [widgetDrawer],
+            keyboardPan: true,
+            keyboardZoom: true
         });
+    
+        widgetDrawer.open();
 
-        if (!Sintium.isMobile()) {
+        /* if (!Sintium.isMobile()) {
             setTimeout(() => {
                 widgetDrawer.open();
-            }, 500);
-        }
+            }, 100);
+        } */
         
         catchDateDimension = catchDataSource.getDataContainer().getCrossfilter().dimension(d => {
             const date = new Date(d[4]);
