@@ -94,6 +94,30 @@ function formattedDate(date) {
     return month + " " + year;
 }
 
+function createSeaMapWidget(_seaMapLayer) {
+    const seaMapWidgetElement = document.createElement('div');
+    seaMapWidgetElement.classList.add('sea-map-widget');
+    seaMapWidgetElement.innerHTML = `
+            <label class="sintium-checkbox-container">
+                <input type="checkbox" value=" value="" checked="true">
+                <span class="checkmark"></span>
+            </label>
+            <div class="title">Sjøkart</div>
+        `;
+    const checkbox = seaMapWidgetElement.querySelector('input');
+    checkbox.addEventListener('input', () => {
+        _seaMapLayer.setVisible(checkbox.checked);
+        gtag('event', 'Interaction', {
+            'event_category' : 'Map',
+            'event_action' : "BaseLayerChanged"
+        });
+    });
+    return {
+        getHTMLElement: () => seaMapWidgetElement,
+        getWidgetId: () => 'sea-map-widget-element'
+    };
+}
+
 const lookupErrors = {};
 
 function mapReducedDataToFeature(feature, fangstFeltKode) {
@@ -122,6 +146,26 @@ function styleFunction(feature, key) {
     }
 
     return styleLookup[styleKey];
+}
+
+function onFilterChange(filters) {
+    const element = document.querySelector('.toolbar-element-for-custom-html');
+    while (element.firstElementChild) {
+        element.firstElementChild.remove();
+    }
+    filters.forEach(({ id , title, dispose }) => {
+        const filterElement = document.createElement('div');
+        filterElement.classList.add('dispose-filter-element');
+        filterElement.innerHTML = `
+            <div class="title">${title} filter</div>
+            <div class="separator">|</div>
+            <div class="dispose">
+                <i class="fas fa-times"></i>
+            </div>
+        `;
+        filterElement.addEventListener('click', dispose);
+        element.appendChild(filterElement);
+    });
 }
 
 function onMapReduceLayerDataChange(data) {
@@ -209,11 +253,6 @@ el.innerHTML = `
     <div class="text">Sjøkart</div>
 `;
 
-const mapWidget = {
-    getHTLMElement: () => el,
-    getWidgetId: () => 'map-widget'
-};
-
 fetch("/data/fangstfelt.json")
     .then(result => result.json())
     .then(json => {
@@ -237,6 +276,8 @@ fetch("/data/fangstfelt.json")
             dateIsText: true,
             timePerIteration: 4000
         });
+
+        playWidget.getHTMLElement().appendChild(topElement.element());
 
         const playWidgetControl = Sintium.widgetControl({
             widget: playWidget,
@@ -426,7 +467,6 @@ fetch("/data/fangstfelt.json")
         });
         timeLineBarChart.getChart().on("filtered", () => sendFilteredGAEvent("timeline"));
 
-
         const temperatureChart = Sintium.boxPlot({
             domId: "box-plot",
             dataSource: catchDataSource,
@@ -527,7 +567,9 @@ fetch("/data/fangstfelt.json")
             // WIDGET GRID
         const grid = Sintium.widgetGrid({ 
             domId: "grid",
-            title: "Data filter"
+            title: "Data filter",
+            onFilterChange: onFilterChange,
+            showRemoveFilterMenu: false
         })
             .addWidget(toolsChart, {
                 title: "Redskap",
@@ -672,25 +714,9 @@ fetch("/data/fangstfelt.json")
                 LAYERS: 'sjokartraster',
                 VERSION: '1.1.1'
             },
-            visible: false
+            visible: true
         });
 
-        const seaMapLayerToggle = Sintium.buttonControl({
-            normalIcon: 'fas fa-map',
-            position: 'top-right',
-            flow: 'vertical',
-        });
-
-        seaMapLayerToggle.onClick(() => {
-            const visible = !seaMapLayerToggle.isActive();
-            seaMapLayerToggle.setActive(visible);
-            seaMapLayer.setVisible(visible);
-            gtag('event', 'Interaction', {
-                'event_category' : 'Map',
-                'event_action' : "BaseLayerChanged"
-            });
-        });
-        
         function getDetailedDownloadUrl() {
             let downloadUrl = DETAILED_CATCH_DOWNLOAD_BASE_URL;
             const timeLineDimension = timeLineBarChart.getChart().dimension();
@@ -785,18 +811,27 @@ fetch("/data/fangstfelt.json")
             downloadUrlFetcherCallback: getDetailedDownloadUrl,
             downloadCallback: detailedCatchDataDownloadCallback
         });
+    
+        const seaMapWidgetControl = Sintium.widgetControl({
+            widget: createSeaMapWidget(seaMapLayer),
+            width: 100,
+            height: 35,
+            flow: 'horizontal',
+            position: 'top-right'
+        });
 
         const map = Sintium.map({
             domId: "map",
             layers: [mapReduceLayer, seaMapLayer],
             controls: [
+                seaMapWidgetControl,
                 legendControl, 
-                seaMapLayerToggle, 
                 downloadControl,
                 playWidgetControl,
-                Sintium.htmlControl({
-                    html: topElement.element()
-                }),
+                /* Sintium.htmlControl({
+                    html: topElement.element(),
+                    position: 'bottom-center'
+                }), */
                 Sintium.locationControl({
                     zoom: 8,
                     position: 'top-right'

@@ -204,15 +204,19 @@
 }
 
 .fa-top-element {
+  position: absolute;
+  left: 50%;
+  margin-left: -120px;
+  margin-top: -100px;
   display: flex;
-  margin-top: 10px;
-  background: rgba(0, 0, 0, 0.2) !important;
-  position: relative;
+  background: rgba(0, 0, 0, 0.4) !important;
   width: 240px;
   height: 30px;
   border-radius: 2px;
   justify-content: center;
   align-items: center;
+  color: white;
+  font-weight: bold;
 }
 
 .widget-grid-container {
@@ -221,4 +225,41 @@
 
 .widget-grid-toolbar div.header {
   background: #007bff !important;
+}
+
+.dispose-filter-element {
+  display: flex;
+  margin-left: 8px;
+  margin-bottom: 8px;
+  background: lightgray;
+  padding: 0 4px;
+}
+
+.dispose-filter-element .title {
+  padding: 6px;
+}
+
+.dispose-filter-element .separator {
+  padding: 6px 0;
+}
+
+.dispose-filter-element .dispose {
+  padding: 7px 10px 5px 10px;
+  cursor: pointer;
+}
+
+.toolbar-element-for-custom-html {
+  flex-wrap: wrap;
+  padding-top: 8px;
+  min-height: 52px;
+}
+
+.sea-map-widget {
+  display: flex;
+  flex-direction: row;
+}
+
+.sea-map-widget .sintium-checkbox-container .checkmark {
+  top: 0 !important;
+  left: 0 !important;
 }

@@ -82,7 +82,7 @@ class DataSelector {
                 </div>
                 <button class="btn btn-primary update" disabled>
                     <span class="spinner-border spinner-border-sm status" role="status" aria-hidden="true" style=""></span>
-                    <div class="search-button-text">Oppdater</div>
+                    <div class="search-button-text">Last ned data</div>
                 </button>
                 <button class="btn btn-primary status-small" disabled>
                     <span class="spinner-border spinner-border-sm status" role="status" aria-hidden="true" style=""></span>
